@@ -1,9 +1,6 @@
 package com.example.lottery
 
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.util.Log
 import android.graphics.Canvas as GraphicsCanvas
 import androidx.compose.foundation.Canvas
@@ -16,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
@@ -26,6 +24,7 @@ import androidx.compose.ui.unit.IntSize
 fun Lottery(
     modifier: Modifier,
     contentGuardColor: Int = Color.LTGRAY,
+    coinSize: Int = 10,
     showContentCallback: ()->Unit,
     content: @Composable BoxScope.()->Unit
 ) = Box(
@@ -47,6 +46,30 @@ fun Lottery(
         }
     }
 
+    val dragPoint = remember { mutableStateOf<Offset?>(null) }
+
+    LaunchedEffect(dragPoint.value){
+        dragPoint.value?.let { point ->
+            contentGuard.value?.let { contentGuardBitmap ->
+                val tempBitmap = Bitmap.createBitmap(contentGuardBitmap.width, contentGuardBitmap.height, Bitmap.Config.ARGB_8888)
+                GraphicsCanvas(tempBitmap).run {
+                    drawBitmap(contentGuardBitmap, 0f, 0f, null)
+                    val eraseRect = RectF(
+                        point.x - coinSize / 2,
+                        point.y - coinSize / 2,
+                        point.x + coinSize / 2,
+                        point.y + coinSize / 2
+                    )
+                    val erasePainter = Paint().apply {
+                        color = Color.RED
+                    }
+                    drawOval(eraseRect, erasePainter)
+                }
+                contentGuard.value = tempBitmap
+            }
+        }
+    }
+
     content()
 
     Canvas(
@@ -55,11 +78,11 @@ fun Lottery(
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = {
-                        Log.e("onDragStart", "${it.x} ${it.y}")
+                        dragPoint.value = it
                     },
                     onDrag = { change, dragAmount ->
                         change.consumeAllChanges()
-                        Log.e("onDrag", "${dragAmount.x} ${dragAmount.y}")
+                        dragPoint.value = dragPoint.value?.plus(dragAmount) ?: dragPoint.value
                     }
                 )
             }
