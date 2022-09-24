@@ -20,12 +20,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
 
     private val doubleLightGray = Color(0xfff0f0f0)
     private val tossBlue5 = Color(0xff1b64da)
+
+    private val show = mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,23 +45,25 @@ class MainActivity : ComponentActivity() {
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.wrapContentSize()
                 ) {
-                    LotteryExample1()
-                    LotteryExample2()
-                    LotteryExample3()
+                    if(show.value){
+                        LotteryExample1()
+                        LotteryExample2()
+                        LotteryExample3()
+                    }
                 }
             }
         }
     }
 
-    private fun showContentCallback() {
-        Toast.makeText(this, "WOW!", Toast.LENGTH_SHORT).show()
-    }
+    private fun showToast(msg: String) =
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
     private fun reset(){
-        val intent = intent
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-        finish()
-        startActivity(intent)
+        lifecycleScope.launch {
+            show.value = false
+            delay(300)
+            show.value = true
+        }
     }
 
     @Composable
@@ -64,7 +71,7 @@ class MainActivity : ComponentActivity() {
         modifier = Modifier
             .size(300.dp, 100.dp)
             .clip(RoundedCornerShape(20)),
-        showContentCallback = ::showContentCallback
+        showContentCallback = { showToast("Hello World Showing") }
     ){
         Box(
             contentAlignment = Alignment.Center,
@@ -85,7 +92,7 @@ class MainActivity : ComponentActivity() {
             .size(300.dp, 300.dp)
             .clip(RoundedCornerShape(20)),
         coinSize = 120,
-        showContentCallback = ::showContentCallback
+        showContentCallback = { showToast("Thumb Up Showing") }
     ){
         Box(
             contentAlignment = Alignment.Center,
@@ -107,7 +114,7 @@ class MainActivity : ComponentActivity() {
             .size(300.dp, 100.dp)
             .clip(RoundedCornerShape(20)),
         coinSize = 120,
-        showContentCallback = ::showContentCallback
+        showContentCallback = { showToast("Reset Button Showing") }
     ){
         Box(
             contentAlignment = Alignment.Center,

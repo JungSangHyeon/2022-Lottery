@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -33,7 +32,7 @@ fun Lottery(
     modifier = modifier
 ) {
     val contentGuardSize = remember{ mutableStateOf<IntSize?>(null) }
-    val contentGuard = rememberSaveable{ mutableStateOf<Bitmap?>(null) }
+    val contentGuard = remember{ mutableStateOf<Bitmap?>(null) }
     LaunchedEffect(contentGuardSize.value){
         initializeContentGuard(contentGuardSize, contentGuard, contentGuardColor)
     }
@@ -43,7 +42,7 @@ fun Lottery(
         erase(dragPoint, contentGuard, coinSize)
     }
 
-    val isShowingContent = rememberSaveable { mutableStateOf(false) }
+    val isShowingContent = remember { mutableStateOf(false) }
     LaunchedEffect(contentGuard.value){
         if(!isShowingContent.value){
             checkIsShowing(
@@ -55,7 +54,9 @@ fun Lottery(
         }
     }
 
-    content()
+    if(contentGuard.value != null){
+        content()
+    }
 
     if(!isShowingContent.value){
         ContentGuard(dragPoint, contentGuard, contentGuardSize)
