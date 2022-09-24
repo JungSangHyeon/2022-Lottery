@@ -25,7 +25,7 @@ fun Lottery(
     coinSize: Int = 80,
     xSamplingCount: Int = 5,
     ySamplingCount: Int = 5,
-    isShowingJudgeFactor: Float = 0.6f,
+    isShowingJudgeFactor: Float = 0.75f,
     showContentCallback: ()->Unit,
     content: @Composable BoxScope.()->Unit
 ) = Box(
