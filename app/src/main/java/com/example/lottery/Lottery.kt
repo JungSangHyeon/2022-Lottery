@@ -19,6 +19,7 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
+import androidx.core.graphics.get
 
 @Composable
 fun Lottery(
@@ -43,19 +44,6 @@ fun Lottery(
                 val canvasRect = Rect(0, 0, it.width, it.height)
                 val backgroundPainter = Paint().apply { color = contentGuardColor }
                 drawRect(canvasRect, backgroundPainter)
-
-                val xSpace = it.width / (xSamplingCount + 1)
-                val ySpace = it.height / (ySamplingCount + 1)
-                (1 .. xSamplingCount).forEach { x ->
-                    (1 .. ySamplingCount).forEach { y ->
-                        val xPoint = x * xSpace
-                        val yPoint = y * ySpace
-                        val samplingRect = Rect(xPoint - 5, yPoint - 5, xPoint + 5, yPoint + 5)
-                        val samplingPainter = Paint().apply { color = Color.RED }
-                        drawRect(samplingRect, samplingPainter)
-                    }
-                }
-
             }
             contentGuard.value = tempBitmap
         }
@@ -86,6 +74,23 @@ fun Lottery(
 
     val isShowingContent = remember { mutableStateOf(false) }
     LaunchedEffect(contentGuard.value){
+        contentGuard.value?.let {
+            val samplingCount = xSamplingCount * ySamplingCount
+            var erasedCount = 0
+
+            val xSpace = it.width / (xSamplingCount + 1)
+            val ySpace = it.height / (ySamplingCount + 1)
+            (1 .. xSamplingCount).forEach { x ->
+                (1 .. ySamplingCount).forEach { y ->
+                    val xPoint = x * xSpace
+                    val yPoint = y * ySpace
+                    if(Color.TRANSPARENT == it[xPoint, yPoint]) erasedCount++
+                }
+            }
+
+            val erasePercent = erasedCount.toFloat()/samplingCount
+            isShowingContent.value = erasePercent > isShowingJudgeFactor
+        }
     }
 
     content()
