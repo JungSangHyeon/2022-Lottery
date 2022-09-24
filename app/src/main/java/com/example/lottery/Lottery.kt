@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.IntSize
 fun Lottery(
     modifier: Modifier,
     contentGuardColor: Int = Color.LTGRAY,
-    coinSize: Int = 10,
+    coinSize: Int = 80,
     showContentCallback: ()->Unit,
     content: @Composable BoxScope.()->Unit
 ) = Box(
@@ -61,7 +61,7 @@ fun Lottery(
                         point.y + coinSize / 2
                     )
                     val erasePainter = Paint().apply {
-                        color = Color.RED
+                        xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
                     }
                     drawOval(eraseRect, erasePainter)
                 }
