@@ -1,7 +1,6 @@
 package com.example.lottery
 
 import android.graphics.*
-import android.util.Log
 import android.graphics.Canvas as GraphicsCanvas
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -11,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,7 +36,7 @@ fun Lottery(
     modifier = modifier
 ) {
     val contentGuardSize = remember{ mutableStateOf<IntSize?>(null) }
-    val contentGuard = remember{ mutableStateOf<Bitmap?>(null) }
+    val contentGuard = rememberSaveable{ mutableStateOf<Bitmap?>(null) }
     LaunchedEffect(contentGuardSize.value){
         contentGuardSize.value?.let {
             val tempBitmap = Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888)
@@ -72,7 +72,7 @@ fun Lottery(
         }
     }
 
-    val isShowingContent = remember { mutableStateOf(false) }
+    val isShowingContent = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(contentGuard.value){
         contentGuard.value?.let {
             val samplingCount = xSamplingCount * ySamplingCount
@@ -90,6 +90,7 @@ fun Lottery(
 
             val erasePercent = erasedCount.toFloat()/samplingCount
             isShowingContent.value = erasePercent > isShowingJudgeFactor
+            if(isShowingContent.value) showContentCallback()
         }
     }
 
@@ -111,7 +112,8 @@ fun Lottery(
                     )
                 }
                 .onGloballyPositioned {
-                    contentGuardSize.value = it.size
+                    if(contentGuard.value == null) // for save state
+                        contentGuardSize.value = it.size
                 }
         ){
             contentGuard.value?.let {
