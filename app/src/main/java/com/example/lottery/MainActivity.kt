@@ -1,6 +1,7 @@
 package com.example.lottery
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showContentCallback() {
-        TODO("Not yet implemented")
+        Toast.makeText(this, "WOW!", Toast.LENGTH_SHORT).show()
     }
 }
