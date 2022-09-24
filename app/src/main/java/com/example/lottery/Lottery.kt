@@ -33,7 +33,6 @@ fun Lottery(
 ) {
     val contentGuardSize = remember{ mutableStateOf<IntSize?>(null) }
     val contentGuard = remember{ mutableStateOf<Bitmap?>(null) }
-
     LaunchedEffect(contentGuardSize.value){
         contentGuardSize.value?.let {
             val tempBitmap = Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888)
@@ -47,7 +46,6 @@ fun Lottery(
     }
 
     val dragPoint = remember { mutableStateOf<Offset?>(null) }
-
     LaunchedEffect(dragPoint.value){
         dragPoint.value?.let { point ->
             contentGuard.value?.let { contentGuardBitmap ->
@@ -70,28 +68,35 @@ fun Lottery(
         }
     }
 
+    val isShowingContent = remember { mutableStateOf(false) }
+    LaunchedEffect(dragPoint.value){
+
+    }
+
     content()
 
-    Canvas(
-        modifier = Modifier
-            .matchParentSize()
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = {
-                        dragPoint.value = it
-                    },
-                    onDrag = { change, dragAmount ->
-                        change.consumeAllChanges()
-                        dragPoint.value = dragPoint.value?.plus(dragAmount) ?: dragPoint.value
-                    }
-                )
+    if(!isShowingContent.value){
+        Canvas(
+            modifier = Modifier
+                .matchParentSize()
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = {
+                            dragPoint.value = it
+                        },
+                        onDrag = { change, dragAmount ->
+                            change.consumeAllChanges()
+                            dragPoint.value = dragPoint.value?.plus(dragAmount) ?: dragPoint.value
+                        }
+                    )
+                }
+                .onGloballyPositioned {
+                    contentGuardSize.value = it.size
+                }
+        ){
+            contentGuard.value?.let {
+                drawImage(it.asImageBitmap())
             }
-            .onGloballyPositioned {
-                contentGuardSize.value = it.size
-            }
-    ){
-        contentGuard.value?.let {
-            drawImage(it.asImageBitmap())
         }
     }
 }
