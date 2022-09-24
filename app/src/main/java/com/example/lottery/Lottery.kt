@@ -1,5 +1,7 @@
 package com.example.lottery
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -7,7 +9,9 @@ import androidx.compose.ui.Modifier
 fun Lottery(
     modifier: Modifier,
     showContentCallback: ()->Unit,
-    content: @Composable ()->Unit
-){
-    // TODO
+    content: @Composable BoxScope.()->Unit
+) = Box(
+    modifier = modifier
+) {
+    content()
 }
