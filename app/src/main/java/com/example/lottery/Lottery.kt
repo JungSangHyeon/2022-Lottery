@@ -26,6 +26,9 @@ fun Lottery(
     contentGuardColor: Int = Color.LTGRAY,
     coinSize: Int = 80,
     showContentCallback: ()->Unit,
+    xSamplingCount: Int = 5,
+    ySamplingCount: Int = 5,
+    isShowingJudgeFactor: Float = 0.6f,
     content: @Composable BoxScope.()->Unit
 ) = Box(
     contentAlignment = Alignment.Center,
@@ -40,6 +43,19 @@ fun Lottery(
                 val canvasRect = Rect(0, 0, it.width, it.height)
                 val backgroundPainter = Paint().apply { color = contentGuardColor }
                 drawRect(canvasRect, backgroundPainter)
+
+                val xSpace = it.width / (xSamplingCount + 1)
+                val ySpace = it.height / (ySamplingCount + 1)
+                (1 .. xSamplingCount).forEach { x ->
+                    (1 .. ySamplingCount).forEach { y ->
+                        val xPoint = x * xSpace
+                        val yPoint = y * ySpace
+                        val samplingRect = Rect(xPoint - 5, yPoint - 5, xPoint + 5, yPoint + 5)
+                        val samplingPainter = Paint().apply { color = Color.RED }
+                        drawRect(samplingRect, samplingPainter)
+                    }
+                }
+
             }
             contentGuard.value = tempBitmap
         }
@@ -69,8 +85,7 @@ fun Lottery(
     }
 
     val isShowingContent = remember { mutableStateOf(false) }
-    LaunchedEffect(dragPoint.value){
-
+    LaunchedEffect(contentGuard.value){
     }
 
     content()
