@@ -4,8 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.util.Log
 import android.graphics.Canvas as GraphicsCanvas
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
@@ -15,6 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 
@@ -48,6 +52,17 @@ fun Lottery(
     Canvas(
         modifier = Modifier
             .matchParentSize()
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = {
+                        Log.e("onDragStart", "${it.x} ${it.y}")
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consumeAllChanges()
+                        Log.e("onDrag", "${dragAmount.x} ${dragAmount.y}")
+                    }
+                )
+            }
             .onGloballyPositioned {
                 contentGuardSize.value = it.size
             }
